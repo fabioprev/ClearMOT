@@ -37,10 +37,10 @@ Note:           This application computes CLEAR MOT metric for 2D tracking.
 //#define HP_XML_FILE "../results/PTracker-PETS-2009.xml"
 //#define HP_XML_FILE "../results/PTracker-TUD-Campus.xml"
 
-//#define SEQUENCE_PATH "../../../../BoatDetector/Datasets/dtv9_clip_3700_7500/"
-#define SEQUENCE_PATH "../../../../BoatDetector/Datasets/Honk-Kong/"
-//#define SEQUENCE_PATH "../../../../BoatDetector/Datasets/Wester_LLTV_VELA/"
-//#define SEQUENCE_PATH "../../../Datasets/Crowd-PETS09/S2/L1/Time_12-34/View_001/"
+//#define SEQUENCE_PATH "../../BoatDetector/Datasets/dtv9_clip_3700_7500/"
+#define SEQUENCE_PATH "../../BoatDetector/Datasets/Honk-Kong/"
+//#define SEQUENCE_PATH "../../BoatDetector/Datasets/Wester_LLTV_VELA/"
+//#define SEQUENCE_PATH "../../DistributedTracker/Datasets/Crowd-PETS09/S2/L1/Time_12-34/View_001/"
 
 class SeqReader
 {
@@ -66,10 +66,10 @@ public:
 int calMOT(const char* path=NULL)
 {
 	// dtv9_clip_3700_7500:	0.95, 0.85
-	// Honk-Kong:			0.50, 0.90
+	// Honk-Kong:			0.55, 0.90
 	// Wester_LLTV_VELA:	0.85, 2.00
 	ResultParser gt(GT_XML_FILE,1.0);
-	ResultParser hp(HP_XML_FILE,    1.0,                   	0.5,                    0.9);//you may scale the result bounding box: w=w*r*w_r, h=h*r*h_r
+	ResultParser hp(HP_XML_FILE,    1.0,                   	0.55,                    0.9);//you may scale the result bounding box: w=w*r*w_r, h=h*r*h_r
 	//                              [ratio]					[width_ratio]			[height_ratio]
 	C_Mot mot(1.0);//1.0: IOU threshold     
 
