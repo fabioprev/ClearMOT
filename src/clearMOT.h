@@ -97,18 +97,47 @@ public:
 		return rt;
 	}
 	
-	void paintFrame(Mat& frame)
+	void paintFrame(Mat& frame, bool isGroundtruth = false)
 	{
+		static std::map<int,std::pair<int,std::pair<int,int> > > colorMap;
+		static bool isFirstTime = true;
+		
+		if (isFirstTime)
+		{
+			int counter = 1;
+			
+			for (int i = 0; i < 256; i += 63)
+			{
+				for (int j = 0; j < 256; j += 63)
+				{
+					for (int k = 0; k < 256; k += 128, ++counter)
+					{
+						colorMap.insert(make_pair(counter,make_pair(i,make_pair(j,k))));
+					}
+				}
+			}
+			
+			isFirstTime = false;
+		}
+		
 		for (unsigned int i=0;i<matched_couple.size();i++)
 		{
 			//cerr << "GT: (" << matched_couple[i].window.x << "," << matched_couple[i].window.y << endl;
-			
-			rectangle(frame,matched_couple[i].window,Scalar(0,255,0),2);
+			if (isGroundtruth)
+			{
+				const map<int,pair<int,pair<int,int> > >::const_iterator& colorTrack = colorMap.find(matched_couple[i].ID);
+				
+				rectangle(frame,matched_couple[i].window,cvScalar(colorTrack->second.first,colorTrack->second.second.first,colorTrack->second.second.second),2);
+			}
+			else
+			{
+				rectangle(frame,matched_couple[i].window,Scalar(0,255,0),2);
+			}
 			i++;
 			
 			//cerr << "HP: (" << matched_couple[i].window.x << "," << matched_couple[i].window.y << endl;
 			
-			rectangle(frame,matched_couple[i].window,Scalar(0,255,0),1);
+			if (!isGroundtruth)	rectangle(frame,matched_couple[i].window,Scalar(0,255,0),1);
 		}
 		for (unsigned int i=0;i<switched_couple.size();i++)
 		{

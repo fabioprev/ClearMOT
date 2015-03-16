@@ -42,6 +42,8 @@ Note:           This application computes CLEAR MOT metric for 2D tracking.
 //#define SEQUENCE_PATH "../../BoatDetector/Datasets/Wester_LLTV_VELA/"
 //#define SEQUENCE_PATH "../../DistributedTracker/Datasets/Crowd-PETS09/S2/L1/Time_12-34/View_001/"
 
+static bool isGroundtruth = false;
+
 class SeqReader
 {
 	int frameCount;
@@ -55,8 +57,8 @@ public:
 		char _count[10];
 		sprintf(_count,"%d",frameCount);
 		string count=_count;
-		count.insert(count.begin(),3-count.length(),'0');
-		count=count+".png";
+		count.insert(count.begin(),4-count.length(),'0');
+		count=count+".jpg";
 		fileName=fileName+count;
 		frame=imread(fileName);
 		frameCount++;
@@ -69,7 +71,7 @@ int calMOT(const char* path=NULL)
 	// Honk-Kong:			0.55, 0.90
 	// Wester_LLTV_VELA:	0.85, 2.00
 	ResultParser gt(GT_XML_FILE,1.0);
-	ResultParser hp(HP_XML_FILE,    1.0,                   	0.55,                    0.90);//you may scale the result bounding box: w=w*r*w_r, h=h*r*h_r
+	ResultParser hp(HP_XML_FILE,    1.0,                   	1.0,                    1.0);//you may scale the result bounding box: w=w*r*w_r, h=h*r*h_r
 	//                              [ratio]					[width_ratio]			[height_ratio]
 	C_Mot mot(1.0);//1.0: IOU threshold     
 
@@ -93,14 +95,14 @@ int calMOT(const char* path=NULL)
 		return 0;
 	}
 	mot.dealWithDetection(gt.readNextFrame(),hp.readNextFrame());
-	mot.paintFrame(frame);
+	mot.paintFrame(frame,isGroundtruth);
 	imshow("multiTrack",frame);
 	waitKey(0);
 	while(!gt.isEnd() && !hp.isEnd())
 	{
 		reader.readImg(frame);
 		mot.dealWithDetection(gt.readNextFrame(),hp.readNextFrame());
-		mot.paintFrame(frame);
+		mot.paintFrame(frame,isGroundtruth);
 		imshow("multiTrack",frame);
 		waitKey(0);
 	}
@@ -109,10 +111,29 @@ int calMOT(const char* path=NULL)
 	return 0;
 }
 
-int main(int, char**)
+int main(int argc, char** argv)
 {
-	//calMOT(SEQUENCE_PATH);
-	calMOT();
+	char* path = 0;
+	
+	if ((argc < 2) || (argc >= 4))
+	{
+		cerr << "Wrong syntax. Usage: ./ClearMOT <is-groundtruth> [ <dataset-path> ]." << endl;
+		
+		exit(-1);
+	}
+	
+	if (strcmp(argv[1],"0") == 0) isGroundtruth = false;
+	else if (strcmp(argv[1],"1") == 0) isGroundtruth = true;
+	else
+	{
+		cerr << "Wrong syntax. Usage: ./ClearMOT < 1 | 0 > [ <dataset-path> ]." << endl;
+		
+		exit(-1);
+	}
+	
+	if (argc == 3) path = argv[2];
+	
+	calMOT(path);
 	
 	return 0;
 }
