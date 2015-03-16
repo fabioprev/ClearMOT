@@ -26,9 +26,9 @@ Note:           This application computes CLEAR MOT metric for 2D tracking.
 #include "dataReader.h"
 
 //#define GT_XML_FILE "../groundtruth/Groundtruth-dtv9_clip_3700_7500.xml"
-#define GT_XML_FILE "../groundtruth/Groundtruth-Honk-Kong.xml"
+//#define GT_XML_FILE "../groundtruth/Groundtruth-Honk-Kong.xml"
 //#define GT_XML_FILE "../groundtruth/GroundTruth-Wester_LLTV_VELA.xml"
-//#define GT_XML_FILE "../groundtruth/PETS2009-S2L1.xml"
+#define GT_XML_FILE "../groundtruth/PETS2009-S2L1.xml"
 //#define GT_XML_FILE "../groundtruth/TUD-Campus.xml"
 
 //#define HP_XML_FILE "../results/PTracker-dtv9_clip_3700_7500.xml"
@@ -67,12 +67,19 @@ public:
 
 int calMOT(const char* path=NULL)
 {
+	string gtName, hpName;
+	
+	gtName = GT_XML_FILE;
+	
+	if (isGroundtruth) hpName = gtName;
+	else hpName = HP_XML_FILE;
+	
 	// dtv9_clip_3700_7500:	0.95, 0.85
 	// Honk-Kong:			0.55, 0.90
 	// Wester_LLTV_VELA:	0.85, 2.00
-	ResultParser gt(GT_XML_FILE,1.0);
-	ResultParser hp(HP_XML_FILE,    1.0,                   	1.0,                    1.0);//you may scale the result bounding box: w=w*r*w_r, h=h*r*h_r
-	//                              [ratio]					[width_ratio]			[height_ratio]
+	ResultParser gt(gtName.c_str(),1.0);
+	ResultParser hp(hpName.c_str(),    1.0,                   	1.0,                    1.0);//you may scale the result bounding box: w=w*r*w_r, h=h*r*h_r
+	//                                 [ratio]					[width_ratio]			[height_ratio]
 	C_Mot mot(1.0);//1.0: IOU threshold     
 
 	if (path==NULL)
